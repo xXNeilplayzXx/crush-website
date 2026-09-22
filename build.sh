@@ -1,2 +1,4 @@
 #!/bin/bash
-echo "Build complete - static assets ready"
+mkdir -p dist
+cp index.html dist/index.html
+echo "Build complete"
