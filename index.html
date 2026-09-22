@@ -263,7 +263,7 @@
 
 <!-- SECTION 2: Funny warm-up -->
 <div class="scrolly-section" id="scrolly1">
-  <p class="funny">okay first of all, if you're reading this,<br>that means someone was brave enough<br>to send you a weird website. <strong>that's true love.</strong></p>
+  <p class="funny">okay first of all, if you're reading this,<br>that means i was brave enough<br>to send you a weird website. <strong>that's true love.</strong></p>
 </div>
 
 <!-- SECTION 3: Playful -->
@@ -359,28 +359,51 @@ const runawayLines = [
   "not really an option 😬",
   "are you sure?? 🥺",
   "please reconsider...",
-  "i'll be sad :( but ok... wait no try again",
-  "*desperately waving arms* no!",
-  "this button is not cooperating lol"
 ];
 let escapeCount = 0;
 
 noBtn.addEventListener('mouseenter', moveNoButton);
 noBtn.addEventListener('touchstart', moveNoButton);
+noBtn.addEventListener('click', handleNoClick);
 
 function moveNoButton(e) {
   e.preventDefault();
   escapeCount++;
+  if (escapeCount > runawayLines.length) {
+    // After 3 tries, stop running away and let them click
+    noBtn.style.position = '';
+    noBtn.style.left = '';
+    noBtn.style.top = '';
+    noBtn.textContent = "ok fine :(";
+    return;
+  }
   const rect = noBtn.getBoundingClientRect();
   const maxX = window.innerWidth - rect.width;
   const maxY = window.innerHeight - rect.height;
   noBtn.style.position = 'fixed';
   noBtn.style.left = (Math.random() * maxX) + 'px';
   noBtn.style.top = (Math.random() * maxY) + 'px';
+  noBtn.textContent = runawayLines[escapeCount - 1];
+}
 
-  if (escapeCount <= runawayLines.length) {
-    noBtn.textContent = runawayLines[escapeCount - 1];
-  }
+function handleNoClick(e) {
+  e.stopPropagation();
+  const reveal = document.getElementById('revealSection');
+  const result = document.getElementById('resultSection');
+  reveal.style.opacity = '0';
+  setTimeout(() => {
+    reveal.style.display = 'none';
+    result.classList.add('visible');
+    result.style.display = 'flex';
+    document.getElementById('resultText').textContent = 'aww okay... 💔';
+    document.getElementById('resultText').className = 'result-text friend-text';
+    document.getElementById('resultSub').textContent = 'but i\'m glad you opened this website. really.';
+  }, 800);
+  // Notify sender
+  console.log('%c❌ CRUSH SAYS NO', 'color: #c084fc; font-size: 24px; font-weight: bold;');
+  try {
+    fetch('https://your-project.pages.dev/api/log?response=no');
+  } catch(e) {}
 }
 
 // ---- YES BUTTON ----
@@ -398,6 +421,11 @@ function sayYes() {
     document.getElementById('resultSub').textContent = 'i\'m so happy rn. honestly, i really am.';
     launchConfetti();
   }, 800);
+  // Notify sender
+  console.log('%c❤️ CRUSH SAYS YES', 'color: #ff6b9d; font-size: 24px; font-weight: bold;');
+  try {
+    fetch('https://your-project.pages.dev/api/log?response=yes');
+  } catch(e) {}
 }
 
 // ---- CONFETTI ----
