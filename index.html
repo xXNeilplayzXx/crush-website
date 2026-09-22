@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>i have something to tell you</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+    background: #0f0f1a;
+    color: #fff;
+  }
+
+  section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  /* ---- HERO / LANDING ---- */
+  .hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    cursor: default;
+  }
+  .hero h1 {
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    opacity: 0;
+    animation: fadeInUp 1s ease forwards;
+    text-align: center;
+  }
+  .scroll-arrow {
+    margin-top: 2rem;
+    font-size: 2rem;
+    animation: bounce 2s infinite;
+    opacity: 0;
+    animation: fadeInUp 1s ease 1s forwards, bounce 2s ease-in-out 2s infinite;
+  }
+
+  /* ---- SCROLL SECTIONS ---- */
+  .scrolly-section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+  .scrolly-section.visible {
+    opacity: 1;
+  }
+  .scrolly-section p {
+    max-width: 500px;
+    font-size: clamp(1.1rem, 4vw, 1.6rem);
+    line-height: 1.7;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease;
+  }
+  .scrolly-section.visible p {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .funny { color: #ffd6e0; }
+  .warm   { color: #c9b1ff; }
+  .real   { color: #ffffff; font-weight: 600; }
+
+  /* ---- THE REVEAL ---- */
+  .reveal-section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+    background: radial-gradient(ellipse at center, #1a1a2e 0%, #0f0f1a 70%);
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+  .reveal-section.visible {
+    opacity: 1;
+  }
+
+  .big-text {
+    font-size: clamp(2rem, 8vw, 4rem);
+    font-weight: 800;
+    text-align: center;
+    background: linear-gradient(to right, #ff6b9d, #c084fc, #ff6b9d);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 3s linear infinite;
+    z-index: 2;
+    text-shadow: none;
+  }
+  #revealLine1 {
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.8s ease;
+    font-size: clamp(1.3rem, 5vw, 2rem);
+    margin-bottom: 0.3rem;
+  }
+  #revealLine1.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  #revealLine2 {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.8s ease;
+  }
+  #revealLine2.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .hearts-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1;
+  }
+  .floating-heart {
+    position: absolute;
+    bottom: -40px;
+    font-size: 1.5rem;
+    animation: floatUp linear infinite;
+    opacity: 0.6;
+  }
+
+  /* ---- BUTTONS ---- */
+  .buttons {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1.5rem;
+    z-index: 2;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .btn-yes, .btn-no {
+    padding: 1rem 2.5rem;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .btn-yes {
+    background: linear-gradient(135deg, #ff6b9d, #c084fc);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(255, 107, 157, 0.4);
+  }
+  .btn-yes:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 30px rgba(255, 107, 157, 0.6);
+  }
+  .btn-no {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ccc;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    transition: all 0.15s ease;
+  }
+
+  /* ---- RESULT SCREEN ---- */
+  .result-section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+  }
+  .result-section.visible {
+    opacity: 1;
+  }
+  .result-text {
+    font-size: clamp(2rem, 7vw, 3.5rem);
+    font-weight: 800;
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 2;
+  }
+  .result-sub {
+    margin-top: 1rem;
+    font-size: clamp(1rem, 3vw, 1.3rem);
+    opacity: 0;
+    animation: fadeInUp 0.8s ease 0.6s forwards;
+    max-width: 400px;
+    z-index: 2;
+    line-height: 1.6;
+  }
+
+  .yay-text { color: #ff6b9d; }
+  .friend-text { color: #c084fc; }
+
+  canvas#confetti {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* ---- ANIMATIONS ---- */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(12px); }
+  }
+  @keyframes shimmer {
+    to { background-position: 200% center; }
+  }
+  @keyframes floatUp {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+    100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+  }
+  @keyframes popIn {
+    0%   { transform: scale(0.3); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* ---- SPARKLE EMOJI STARS ---- */
+  .sparkle {
+    position: absolute;
+    font-size: 0.8rem;
+    pointer-events: none;
+    animation: sparkleFade 1.5s ease forwards;
+  }
+  @keyframes sparkleFade {
+    0%   { opacity: 1; transform: scale(1) translateY(0); }
+    100% { opacity: 0; transform: scale(0) translateY(-40px); }
+  }
+</style>
+</head>
+<body>
+
+<!-- SECTION 1: Hero / Landing -->
+<section class="hero">
+  <h1>Hey… i have something to tell you.</h1>
+  <div class="scroll-arrow">👇</div>
+</section>
+
+<!-- SECTION 2: Funny warm-up -->
+<div class="scrolly-section" id="scrolly1">
+  <p class="funny">okay first of all, if you're reading this,<br>that means someone was brave enough<br>to send you a weird website. <strong>that's true love.</strong></p>
+</div>
+
+<!-- SECTION 3: Playful -->
+<div class="scrolly-section" id="scrolly2">
+  <p class="funny">i know this is random af and you're probably like<br>"wait what does this mean"</p>
+</div>
+
+<!-- SECTION 4: Getting real -->
+<div class="scrolly-section" id="scrolly3">
+  <p class="warm">but like… beneath all the silly moments,<br>the laughs, and everything in between —<br>there's something i haven't said out loud yet.</p>
+</div>
+
+<!-- SECTION 5: The Reveal -->
+<div class="reveal-section" id="revealSection">
+  <div class="hearts-bg" id="heartsBg"></div>
+  <div class="big-text" id="revealLine0" style="font-size: clamp(1rem, 3.5vw, 1.4rem); color: #ccc; margin-bottom: 1rem;">It's my first time asking this 🥺</div>
+  <div class="big-text" id="revealLine2">I like you. 💛</div>
+  <div class="big-text" id="revealLine1">Would u be...</div>
+  <div class="buttons">
+    <button class="btn-yes" onclick="sayYes()">Yes ✨</button>
+    <button class="btn-no" id="noBtn">No</button>
+  </div>
+</div>
+
+<!-- SECTION 6: Result (hidden until chosen) -->
+<div class="result-section" id="resultSection">
+  <canvas id="confetti"></canvas>
+  <div class="result-text" id="resultText"></div>
+  <div class="result-sub" id="resultSub"></div>
+</div>
+
+<script>
+// ---- SCROLL DETECTION (IntersectionObserver works even for hidden elements) ----
+let revealedReveal = false;
+
+function makeObserver(selector, onEnter) {
+  const el = document.querySelector(selector);
+  if (!el) return;
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        onEnter?.();
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.4 });
+  obs.observe(el);
+}
+
+makeObserver('#scrolly1', null);
+makeObserver('#scrolly2', null);
+makeObserver('#scrolly3', null);
+makeObserver('#revealSection', () => {
+  if (revealedReveal) return;
+  revealedReveal = true;
+  const l0 = document.getElementById('revealLine0');
+  const l1 = document.getElementById('revealLine1');
+  const l2 = document.getElementById('revealLine2');
+  // Phase 1: "it's my first time asking this"
+  l0.style.opacity = '1';
+  l0.style.transform = 'translateY(0)';
+  // Phase 2: "I like you" first
+  l2.style.opacity = '1';
+  l2.style.transform = 'translateY(0)';
+  // Phase 3: "Would u be..." after 800ms
+  setTimeout(() => {
+    l1.classList.add('show');
+  }, 800);
+  startFloatingHearts();
+});
+
+// ---- FLOATING HEARTS ----
+let heartInterval;
+function startFloatingHearts() {
+  const container = document.getElementById('heartsBg');
+  const hearts = ['💛','💕','✨','💖','🤍','💗'];
+  heartInterval = setInterval(() => {
+    const heart = document.createElement('span');
+    heart.className = 'floating-heart';
+    heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+    heart.style.left = Math.random() * 100 + '%';
+    heart.style.animationDuration = (4 + Math.random() * 6) + 's';
+    heart.style.fontSize = (1 + Math.random() * 1.2) + 'rem';
+    container.appendChild(heart);
+    setTimeout(() => heart.remove(), 10000);
+  }, 400);
+}
+
+// ---- NO BUTTON RUNAWAY ----
+const noBtn = document.getElementById('noBtn');
+const runawayLines = [
+  "not really an option 😬",
+  "are you sure?? 🥺",
+  "please reconsider...",
+  "i'll be sad :( but ok... wait no try again",
+  "*desperately waving arms* no!",
+  "this button is not cooperating lol"
+];
+let escapeCount = 0;
+
+noBtn.addEventListener('mouseenter', moveNoButton);
+noBtn.addEventListener('touchstart', moveNoButton);
+
+function moveNoButton(e) {
+  e.preventDefault();
+  escapeCount++;
+  const rect = noBtn.getBoundingClientRect();
+  const maxX = window.innerWidth - rect.width;
+  const maxY = window.innerHeight - rect.height;
+  noBtn.style.position = 'fixed';
+  noBtn.style.left = (Math.random() * maxX) + 'px';
+  noBtn.style.top = (Math.random() * maxY) + 'px';
+
+  if (escapeCount <= runawayLines.length) {
+    noBtn.textContent = runawayLines[escapeCount - 1];
+  }
+}
+
+// ---- YES BUTTON ----
+function sayYes() {
+  const reveal = document.getElementById('revealSection');
+  const result = document.getElementById('resultSection');
+  // Hide reveal smoothly
+  reveal.style.opacity = '0';
+  setTimeout(() => {
+    reveal.style.display = 'none';
+    result.classList.add('visible');
+    result.style.display = 'flex';
+    document.getElementById('resultText').textContent = 'YAYYYYY!!! 🎉🎉🎉';
+    document.getElementById('resultText').className = 'result-text yay-text';
+    document.getElementById('resultSub').textContent = 'i\'m so happy rn. honestly, i really am.';
+    launchConfetti();
+  }, 800);
+}
+
+// ---- CONFETTI ----
+function launchConfetti() {
+  const canvas = document.getElementById('confetti');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const pieces = [];
+  const colors = ['#ff6b9d','#c084fc','#ffd6e0','#fbbf24','#34d399','#60a5fa','#f472b6'];
+
+  for (let i = 0; i < 200; i++) {
+    pieces.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      w: 6 + Math.random() * 8,
+      h: 4 + Math.random() * 4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vx: (Math.random() - 0.5) * 4,
+      vy: 2 + Math.random() * 4,
+      rotation: Math.random() * 360,
+      rotSpeed: (Math.random() - 0.5) * 10,
+      opacity: 1
+    });
+  }
+
+  let frame = 0;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let alive = false;
+    pieces.forEach(p => {
+      if (p.opacity <= 0) return;
+      alive = true;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.05;
+      p.rotation += p.rotSpeed;
+      if (frame > 100) p.opacity -= 0.01;
+
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotation * Math.PI / 180);
+      ctx.globalAlpha = Math.max(0, p.opacity);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+    });
+    frame++;
+    if (alive && frame < 300) requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ---- SPARKLES ON PAGE LOAD ----
+window.addEventListener('load', () => {
+  for (let i = 0; i < 15; i++) {
+    setTimeout(() => addSparkle(), 500 + Math.random() * 1000);
+  }
+});
+
+function addSparkle() {
+  const s = document.createElement('span');
+  s.className = 'sparkle';
+  s.textContent = '✨';
+  s.style.left = Math.random() * window.innerWidth + 'px';
+  s.style.top = Math.random() * window.innerHeight + 'px';
+  document.body.appendChild(s);
+  setTimeout(() => s.remove(), 1500);
+}
+</script>
+
+</body>
+</html>
